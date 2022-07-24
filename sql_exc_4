@@ -1,0 +1,54 @@
+#1.
+
+delimiter //
+create trigger insert_amount_trigger
+before insert on payment
+for each row
+begin
+if new.amount not like '%.99%' then
+set new.amount = NULL;
+end if;
+end//
+delimiter ;
+
+
+#2.
+
+delimiter //
+create trigger update_amount_trigger
+before update on payment
+for each row
+begin
+if new.amount not like '%.99%' then
+set new.amount = NULL;
+end if;
+end//
+delimiter ;
+
+
+#3.
+
+insert into alikas.payment values (1,1,1,76,3.99,'2005-05-25 11:30:37','2005-05-25 11:30:37');
+
+
+#4.
+
+create table film_text_audit (
+film_id int,
+user varchar(100),
+time varchar(100)
+);
+
+delimiter //
+create trigger film_delete_log
+before delete on film_text
+for each row
+begin
+insert into film_text_audit values (old.film_id, user(), CURRENT_TIMESTAMP());
+end//
+delimiter ;
+
+SET SQL_SAFE_UPDATES = 0;
+delete from alikas.film_text WHERE film_id = 15;
+SET SQL_SAFE_UPDATES = 1;
+
